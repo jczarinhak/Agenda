@@ -39,7 +39,7 @@ export class CadastrarPage implements OnInit {
       !this.validar(this.dataNascimento) ||
       !this.validar(this.genero)
     ) {
-      this.presentAlert("Erro ao Cadastrar", "campos são obrigatórios");
+      this.presentAlert("Erro ao Cadastrar", "Todos os campos são obrigatórios");
       return;
     }
 
@@ -51,7 +51,7 @@ export class CadastrarPage implements OnInit {
     );
 
     this.contatoService.create(contato);
-    this.presentAlert("Sucesso", "Contato Cadastrado");
+    this.presentAlert("Sucesso", "Contato cadastrado com sucesso!");
     this.router.navigate(["/home"]);
   }
 
@@ -62,8 +62,8 @@ export class CadastrarPage implements OnInit {
   async presentAlert(subHeader: string, message: string) {
     const alert = await this.alertController.create({
       header: 'Agenda de Contatos',
-      subHeader: subHeader,
-      message: message,
+      subHeader,
+      message,
       buttons: ['Ok'],
     });
     await alert.present();

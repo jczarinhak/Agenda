@@ -5,6 +5,9 @@ import { Contato } from '../model/contato';
   providedIn: 'root'
 })
 export class ContatoService {
+  remover(contato: Contato) {
+    throw new Error('Method not implemented.');
+  }
   private _contatos: Contato[] = [];
 
   constructor(){

@@ -5,7 +5,7 @@ import { IonicModule } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { Contato } from 'src/app/model/contato';
 import { ContatoService } from 'src/app/service/contato.service';
-import { AlertController } from '@ionic/angular/standalone';
+import { UiService } from 'src/app/service/ui.service';
 
 @Component({
   selector: 'app-detalhar',
@@ -25,12 +25,12 @@ export class DetalharPage implements OnInit {
 
   constructor(
     private router: Router,
-    private alertController: AlertController,
-    private contatoService: ContatoService
+    private contatoService: ContatoService,
+    private uiService: UiService
   ) { }
 
   ngOnInit() {
-    this.maxDate = new Date().toISOString().split('T')[0]; // data máxima = hoje
+    this.maxDate = new Date().toISOString().split('T')[0];
 
     const nav = this.router.getCurrentNavigation();
     if (nav?.extras?.state?.['objeto']) {
@@ -42,71 +42,53 @@ export class DetalharPage implements OnInit {
     }
   }
 
-  async presentAlert(subHeader: string, message: string) {
-    const alert = await this.alertController.create({
-      header: 'Agenda de Contatos',
-      subHeader: subHeader,
-      message: message,
-      buttons: ['OK']
-    });
-    await alert.present();
-  }
-
-  async presentConfirmAlert(subHeader: string, message: string) {
-    const alert = await this.alertController.create({
-      header: 'Agenda de Contatos',
-      subHeader: subHeader,
-      message: message,
-      buttons: [
-        {
-          text: 'Cancelar',
-          role: 'cancel',
-          cssClass: 'secondary',
-          handler: () => {}
-        },
-        {
-          text: 'Confirmar',
-          handler: () => { this.excluir(); }
-        }
-      ]
-    });
-    await alert.present();
-  }
-
   private validar(campo: any): boolean {
     return !!campo;
   }
 
-  salvar() {
+  async salvar() {
     if (!this.validar(this.nome) || !this.validar(this.telefone)) {
-      this.presentAlert("Erro ao cadastrar", "Preencha todos os campos obrigatórios.");
+      this.uiService.showAlert('Erro ao cadastrar', 'Preencha todos os campos obrigatórios.');
       return;
     }
 
     this.dataNascimento = this.dataNascimento.split('T')[0];
 
-    if (this.contatoService.editar(this.contato, this.nome, this.telefone, this.genero, this.dataNascimento)) {
-      this.presentAlert('Atualizar', 'Contato atualizado com sucesso');
+    const sucesso = this.contatoService.editar(
+      this.contato,
+      this.nome,
+      this.telefone,
+      this.genero,
+      this.dataNascimento
+    );
+
+    if (sucesso) {
+      await this.uiService.showAlert('Atualizar', 'Contato atualizado com sucesso');
       this.router.navigate(['/home']);
     } else {
-      this.presentAlert('Atualizar', 'Erro ao atualizar contato');
+      await this.uiService.showAlert('Atualizar', 'Erro ao atualizar contato');
     }
   }
 
-  confirmarExclusao() {
-    this.presentConfirmAlert('Excluir', 'Deseja realmente excluir este contato?');
+  async confirmarExclusao() {
+    const confirm = await this.uiService.showConfirm(
+      'Excluir',
+      'Deseja realmente excluir este contato?'
+    );
+
+    if (confirm) {
+      this.excluirContato();
+    }
   }
 
-  excluir() {
-    this.presentConfirmAlert('Excluir', 'Deseja realmente excluir este contato?');
-    this.excluirContato();
-  }
-  excluirContato(){
-    if (this.contatoService.delete(this.contato)) {
-      this.presentAlert('Excluir', 'Contato excluído com sucesso');
+  private async excluirContato() {
+    const sucesso = this.contatoService.delete(this.contato);
+
+    if (sucesso) {
+      await this.uiService.showAlert('Excluir', 'Contato excluído com sucesso');
       this.router.navigate(['/home']);
     } else {
-      this.presentAlert('Erro ao excluir', 'Contato não encontrado');
+      await this.uiService.showAlert('Erro ao excluir', 'Contato não encontrado');
     }
   }
 

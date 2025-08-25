@@ -1,3 +1,25 @@
-ion-item{
-  color:red;
+.home-content {
+  --background: #ffffff;
+}
+
+ion-item-sliding {
+  margin-bottom: 10px;
+}
+
+ion-item {
+  --background: #e6f0ff; // azul claro
+  border-radius: 12px;
+}
+
+ion-toolbar {
+  --background: #cce0ff; // azul suave
+  color: #004080;
+}
+
+.no-contacts {
+  text-align: center;
+  color: #666666;
+  margin-top: 50%;
+  font-size: 1.1rem;
+  font-style: italic;
 }
